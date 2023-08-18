@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, ChangeEvent } from 'react'
+import React, { useState, useRef, useEffect, ChangeEvent, FormEvent } from 'react'
 import { RxCross1 } from 'react-icons/rx'
 import { TiTick } from 'react-icons/ti'
 import { AiFillInfoCircle } from 'react-icons/ai'
@@ -33,14 +33,12 @@ const Register = () => {
   // Validate the username
   useEffect(() => {
     const result = USER_REGEX.test(user)
-    // console.log({ result, user })
     setValidName(result)
   }, [user])
 
   // Validate the passwords
   useEffect(() => {
     const result = PWD_REGEX.test(password)
-    console.log({ result, password })
     setValidPassword(result)
     const match = password === matchPassword
     setValidMatch(match)
@@ -48,7 +46,7 @@ const Register = () => {
 
   useEffect(() => {
     setError('')
-    console.log({ user, password, matchPassword })
+    // console.log({ user, password, matchPassword })
   }, [user, password, matchPassword])
 
   const formStructure = [
@@ -109,49 +107,64 @@ const Register = () => {
     },
   ]
 
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    console.log({ user, password })
+    setSuccess(true)
+  }
+
   return (
-    <section className='mx-4 md:mx-0 p-3 w-full md:w-1/2 bg-blue-800 flex flex-col gap-y-4'>
-      {error && <p ref={errRef}> { error } </p>}
-      <h1 className='text-2xl'>
-        Register
-      </h1>
-      <form className='flex flex-col gap-y-4'>
-        {formStructure.map((item, index) => (
-          <div className='flex flex-col gap-y-1' key={index}>
-            <label htmlFor={item.id} className='flex flex-row items-center gap-x-2'>
-              { item.label }
-              <span className={item.tickIconCondition ? 'visible' : 'hidden'}>
-                <TiTick className='text-green-500' />
-              </span>
-              <span className={item.crossIconCondition ? 'hidden' : 'visible'}>
-                <RxCross1 className='text-red-500' />
-              </span>
-            </label>
-            <input 
-              id={item.id}
-              type={item.type} 
-              name={item.name} 
-              ref={item?.ref}
-              autoComplete='off'
-              className='rounded text-black px-2 py-1'
-              required
-              onFocus={item.onFocus}
-              onBlur={item.onBlur}
-              onChange={item.changeEvent}
-              aria-invalid={validPassword ? 'false' : 'true'}
-              aria-describedby={item.ariaNote}
-            />
-            <p id={item.ariaNote} className={item?.instructionCondition ? 'bg-black mt-2 p-1 rounded-lg' : 'hidden' }>
-              { item?.instructionText }
-            </p>
+    <section className='mx-4 md:mx-0 p-3 w-full md:w-1/2 bg-blue-800 flex flex-col gap-y-4 min-h-[25rem]'>
+      {success ? (
+        <h1> SUCCESS! </h1>
+      ) : (
+        <>
+          {error && <p ref={errRef}> { error } </p>}
+          <h1 className='text-2xl'>
+            Register
+          </h1>
+          <form className='flex flex-col gap-y-4' onSubmit={handleSubmit}>
+            {formStructure.map((item, index) => (
+              <div className='flex flex-col gap-y-1' key={index}>
+                <label htmlFor={item.id} className='flex flex-row items-center gap-x-2'>
+                  { item.label }
+                  <span className={item.tickIconCondition ? 'visible' : 'hidden'}>
+                    <TiTick className='text-green-500' />
+                  </span>
+                  <span className={item.crossIconCondition ? 'hidden' : 'visible'}>
+                    <RxCross1 className='text-red-500' />
+                  </span>
+                </label>
+                <input 
+                  id={item.id}
+                  type={item.type} 
+                  name={item.name} 
+                  ref={item?.ref}
+                  autoComplete='off'
+                  className='rounded text-black px-2 py-1'
+                  required
+                  onFocus={item.onFocus}
+                  onBlur={item.onBlur}
+                  onChange={item.changeEvent}
+                  aria-invalid={validPassword ? 'false' : 'true'}
+                  aria-describedby={item.ariaNote}
+                />
+                <p id={item.ariaNote} className={item?.instructionCondition ? 'bg-black mt-2 p-1 rounded-lg' : 'hidden' }>
+                  { item?.instructionText }
+                </p>
+              </div>
+            ))} 
+            <button 
+            className={`w-full py-1 rounded ${validName && validPassword && validMatch ? 'bg-blue-600 hover:brightness-125 duration-500' : 'bg-gray-300 text-gray-400'}`}
+            disabled={!validName || !validPassword || !validMatch ? true : false }
+            > Sign up </button>
+          </form>
+          <div className='flex flex-col'>
+            <span> Already registered? </span>
+            <span className='underline cursor-pointer'> Sign in! </span>
           </div>
-        ))} 
-      </form>
-      <button className='w-full py-1 bg-blue-600 rounded'> Sign up </button>
-      <div className='flex flex-col'>
-        <span> Already registered? </span>
-        <span className='underline cursor-pointer'> Sign in! </span>
-      </div>
+        </>
+      )}
     </section>
   )
 }
