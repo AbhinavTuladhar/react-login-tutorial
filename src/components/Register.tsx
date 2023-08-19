@@ -6,8 +6,24 @@ import { AiFillInfoCircle } from 'react-icons/ai'
 const USER_REGEX = /^[a-zA-z][a-zA-z0-9-_]{3,23}$/
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
+type FormField = {
+  type: string,
+  label: string,
+  name: string,
+  id: string,
+  ref?: React.MutableRefObject<HTMLInputElement>,
+  onFocus: () => void,
+  onBlur: () => void,
+  changeEvent: (event: ChangeEvent<HTMLInputElement>) => void,
+  ariaNote?: string,
+  instructionCondition: boolean,
+  tickIconCondition: boolean,
+  crossIconCondition: boolean,
+  instructionText: JSX.Element
+}
+
 const Register = () => {
-  const userRef = useRef()
+  const userRef = useRef<HTMLInputElement>()
   const errRef = useRef()
 
   const [user, setUser] = useState('')
@@ -26,9 +42,9 @@ const Register = () => {
   const [success, setSuccess] = useState(false)
 
   // Focus on the username on the first render
-  // useEffect(() => {
-  //   userRef.current.focus()
-  // }, [])
+  useEffect(() => {
+    userRef.current.focus()
+  }, [])
 
   // Validate the username
   useEffect(() => {
@@ -49,7 +65,7 @@ const Register = () => {
     // console.log({ user, password, matchPassword })
   }, [user, password, matchPassword])
 
-  const formStructure = [
+  const formStructure: FormField[] = [
     { 
       type: 'text', label: 'Username:', name: 'userName', id: 'username', ref: userRef, 
       onFocus: () => setUserFocus(true), 
@@ -94,7 +110,7 @@ const Register = () => {
       changeEvent: (event: ChangeEvent<HTMLInputElement>) => setMatchPassword(event.target.value),
       ariaNote: 'matchnote',
       instructionCondition: matchFocus && !validMatch,
-      tickIconCondition: validMatch && matchPassword,
+      tickIconCondition: Boolean(validMatch && matchPassword),
       crossIconCondition: validMatch || !matchPassword,
       instructionText: (
         <>
